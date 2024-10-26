@@ -2,97 +2,101 @@ service: dynamodb-apigateway
 
 provider:
   name: aws
-  runtime: nodejs14.x
+  runtime: nodejs16.x  # Updated to Node.js 16
   stage: dev
   region: us-east-1 
   environment:
     DYNAMODB_TABLE_NAME: ${self:custom.postsTableName}
 
-  custom:
-    postsTableName: posts-table-${self:provider.stage}
+custom:  # Adjusted indentation to the same level as provider, functions, and resources
+  postsTableName: posts-table-${self:provider.stage}
 
-  plugins:
-    - serverless-iam-roles-per-function
+plugins:
+  - serverless-iam-roles-per-function
 
-  functions:
-    getPost:
-      handler: api.getPost
-      name: get-post
-      memorySize: 128
-      events:
-        - http:
-            path: post/{postId}
-            method: GET
-      iamRoleStatements:
-        - Effect: Allow
-          Action:
-            - dynamodb:GetItem
-          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.postsTableName}" 
-    createPost:
-      handler: api.createPost
-      name: create-post
-      memorySize: 128
-      events:
-        - http:
-            path: post
-            method: POST
-      iamRoleStatements:      
-        - Effect: Allow
-          Action:
-            - dynamodb:PutItem
-          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.postsTableName}"
-    updatePost:
-      handler: api.updatePost
-      name: update-post
-      memorySize: 128
-      events:
-        - http:
-            path: post/{postId}
-            method: PUT
-      iamRoleStatements:
-        - Effect: Allow
-          Action:
-            - dynamodb:UpdateItem
-          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.postsTableName}"
-    deletePost:
-      handler: api.deletePost
-      name: delete-post
-      memorySize: 128
-      events:
-        - http:
-            path: post/{postId}
-            method: DELETE
-      iamRoleStatements:
-        - Effect: Allow
-          Action:
-            - dynamodb:DeleteItem
-          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.postsTableName}" 
-    getAllPosts:
-      handler: api.getAllPosts
-      name: get-all-posts
-      memorySize: 128
-      events:
-        - http:
-            path: posts
-            method: GET
-      iamRoleStatements:
-        - Effect: Allow
-          Action:
-            - dynamodb:Scan
-          Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.postsTableName}" 
+functions:
+  getPost:
+    handler: api.getPost
+    name: get-post
+    memorySize: 128
+    events:
+      - http:
+          path: post/{postId}
+          method: GET
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:GetItem
+        Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.postsTableName}" 
 
-  resources:
-    Resources:
-      PostsTable:
-        Type: AWS::DynamoDB::Table
-        Properties:
-          TableName: ${self:custom.postsTableName}
-          AttributeDefinitions:
-            - AttributeName: postId
-              AttributeType: S
-          KeySchema:
-            - AttributeName: postId
-              KeyType: HASH
-          ProvisionedThroughput:
-            ReadCapacityUnits: 1
-            WriteCapacityUnits: 1
+  createPost:
+    handler: api.createPost
+    name: create-post
+    memorySize: 128
+    events:
+      - http:
+          path: post
+          method: POST
+    iamRoleStatements:      
+      - Effect: Allow
+        Action:
+          - dynamodb:PutItem
+        Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.postsTableName}"
+
+  updatePost:
+    handler: api.updatePost
+    name: update-post
+    memorySize: 128
+    events:
+      - http:
+          path: post/{postId}
+          method: PUT
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:UpdateItem
+        Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.postsTableName}"
+
+  deletePost:
+    handler: api.deletePost
+    name: delete-post
+    memorySize: 128
+    events:
+      - http:
+          path: post/{postId}
+          method: DELETE
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:DeleteItem
+        Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.postsTableName}" 
+
+  getAllPosts:
+    handler: api.getAllPosts
+    name: get-all-posts
+    memorySize: 128
+    events:
+      - http:
+          path: posts
+          method: GET
+    iamRoleStatements:
+      - Effect: Allow
+        Action:
+          - dynamodb:Scan
+        Resource: "arn:aws:dynamodb:${self:provider.region}:*:table/${self:custom.postsTableName}"
+
+resources:
+  Resources:
+    PostsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${self:custom.postsTableName}
+        AttributeDefinitions:
+          - AttributeName: postId
+            AttributeType: S
+        KeySchema:
+          - AttributeName: postId
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
