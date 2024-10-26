@@ -4,7 +4,7 @@ provider:
   name: aws
   runtime: nodejs16.x  # Updated to Node.js 16
   stage: dev
-  region: us-east-1 
+  region: us-east-2
   environment:
     DYNAMODB_TABLE_NAME: ${self:custom.postsTableName}
 
